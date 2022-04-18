@@ -147,6 +147,11 @@ export default class Game extends React.Component<{}, StateGame>
       }
     }
 
+    if (!winner && boardModel.board.every((col) => col.every((cell) => cell)))
+    {
+      winner = "Draw!";
+    }
+
     return winner;
   }
 
