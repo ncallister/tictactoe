@@ -1,166 +1,18 @@
 import React from 'react';
 import Square from './square';
+import GameState from './gameState';
 
 interface BoardProps
 {
   boardHeight : number;
   boardWidth : number;
-  winSize : number;
+  players : Array<string>;
+  gameState : GameState;
+  cellClicked : Function;
 }
 
-interface BoardState
+export default class Board extends React.Component<BoardProps, {}>
 {
-  boardModel: Array<Array<string>>;
-  players: Array<string>;
-  nextPlayer: number;
-  winner : string;
-}
-
-export default class Board extends React.Component<BoardProps, BoardState>
-{
-  constructor(props : BoardProps)
-  {
-    super(props);
-
-    // props.boardHeight = props.boardHeight || 3;
-    // props.boardWidth = props.boardWidth || 3;
-    // props.winSize = props.winSize || 3;
-
-    const boardHeight = props.boardHeight ?? 3;
-    const boardWidth = props.boardWidth ?? 3;
-
-    var boardColumn = Array(boardHeight).fill(null);
-    var board = Array(boardWidth);
-    for (var i = 0 ; i < boardWidth ; ++i)
-    {
-      board[i] = boardColumn.slice();
-    }
-
-    this.state = 
-    {
-      boardModel: board,
-      players: ['X', 'O'],
-      nextPlayer: 0,
-      winner: null,
-    }
-  }
-
-  cellClicked(x : number, y : number)
-  {
-    console.log('board clicked: ' + x + ', ' + y);
-    if (this.state.winner === null && this.state.boardModel[x][y] === null)
-    {
-      const boardModel = this.state.boardModel.slice();
-      boardModel[x][y] = this.state.players[this.state.nextPlayer];
-      this.setState(
-        { 
-          nextPlayer: (this.state.nextPlayer + 1) % this.state.players.length,
-          boardModel: boardModel,
-          winner: this.getWinner(),
-        })
-    }
-  }
-
-  getWinnerRow(rowIndex : number) : string
-  {
-    var winner : string = null;
-    for (var i = 0 ; winner == null && i + this.props.winSize <= this.props.boardWidth ; ++i)
-    {
-      winner = this.state.boardModel[i][rowIndex];
-      for (var offset = 1 ; winner != null && offset < this.props.winSize ; ++offset )
-      {
-        if (this.state.boardModel[i + offset][rowIndex] !== winner)
-        {
-          winner = null;
-        }
-      }
-    }
-    return winner;
-  }
-
-  getWinnerColumn(colIndex : number) : string
-  {
-    var winner : string = null;
-    for (var i = 0 ; winner == null && i + this.props.winSize <= this.props.boardHeight ; ++i)
-    {
-      winner = this.state.boardModel[colIndex][i];
-      for (var offset = 1 ; winner != null && offset < this.props.winSize ; ++offset )
-      {
-        if (this.state.boardModel[colIndex][i + offset] !== winner)
-        {
-          winner = null;
-        }
-      }
-    }
-    return winner;
-  }
-
-  getWinnerDiagonal(x : number, y : number) : string
-  {
-    var winner : string = null;
-
-    // Check whether we are too low to be possible
-    if (y + this.props.winSize > this.props.boardHeight)
-    {
-      return null;
-    }
-
-    // Try right down diagonal
-    if (x + this.props.winSize <= this.props.boardWidth)
-    {
-      winner = this.state.boardModel[x][y];
-      for (var offset = 1 ; winner != null && offset < this.props.winSize ; ++offset)
-      {
-        if (this.state.boardModel[x + offset][y + offset] !== winner)
-        {
-          winner = null;
-        }
-      }
-    }
-
-    if (winner == null)
-    {
-      // Try left down diagonal
-      if (x - this.props.winSize >= -1)
-      {
-        winner = this.state.boardModel[x][y];
-        for (offset = 1 ; winner != null && offset < this.props.winSize ; ++offset)
-        {
-          if (this.state.boardModel[x - offset][y + offset] !== winner)
-          {
-            winner = null;
-          }
-        }
-      }
-    }
-
-    return winner;
-  }
-
-  getWinner() : string
-  {
-    var winner : string = null;
-
-    for (var row = 0 ; winner == null && row < this.props.boardHeight ; ++row)
-    {
-      winner = this.getWinnerRow(row);
-    }
-    for (var col = 0 ; winner == null && col < this.props.boardWidth ; ++col)
-    {
-      winner = this.getWinnerColumn(col);
-    }
-    for (var sRow = 0 ; winner == null && sRow < this.props.boardWidth ; ++sRow)
-    {
-      for (var sCol = 0 ; winner == null && sCol < this.props.boardHeight ; ++sCol)
-      {
-        winner = this.getWinnerDiagonal(sCol, sRow);
-      }
-    }
-
-
-    return winner;
-  }
-
   renderRow(row: number) : Array<JSX.Element>
   {
     var squares = new Array<JSX.Element>(this.props.boardWidth);
@@ -168,8 +20,8 @@ export default class Board extends React.Component<BoardProps, BoardState>
     {
       const column = col;
       squares[col] = <Square 
-            value={ this.state.boardModel[col][row] } 
-            onClick={ () => this.cellClicked(column, row) }
+            value={ this.props.gameState.board[col][row] } 
+            onClick={ () => this.props.cellClicked(column, row) }
             key={ 'cell-' + col + ',' + row }
         />;
     }
@@ -188,13 +40,13 @@ export default class Board extends React.Component<BoardProps, BoardState>
 
   getStatus() : string
   {
-    if (this.state.winner == null)
+    if (this.props.gameState.winner == null)
     {
-      return 'Next player: ' + this.state.players[this.state.nextPlayer];
+      return 'Next player: ' + this.props.players[this.props.gameState.nextPlayer];
     }
     else
     {
-      return 'Winner: ' + this.state.winner;
+      return 'Winner: ' + this.props.gameState.winner;
     }
   }
 
