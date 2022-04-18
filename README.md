@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Extra links:
+
+  * https://www.typescriptlang.org/docs/handbook/react.html
+  * https://blog.logrocket.com/using-typescript-with-react-tutorial-examples/
+  * https://www.typescriptlang.org/docs/
+  * https://www.makeuseof.com/how-to-deploy-react-app-with-github-pages/
+
 ## Available Scripts
 
 In the project directory, you can run:
