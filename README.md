@@ -9,6 +9,10 @@ Extra links:
   * https://www.typescriptlang.org/docs/
   * https://www.makeuseof.com/how-to-deploy-react-app-with-github-pages/
 
+Future research:
+
+  * https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
+
 ## Available Scripts
 
 In the project directory, you can run:
